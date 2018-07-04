@@ -1,7 +1,9 @@
 from sklearn.svm import *
 from sklearn.multiclass import *
 from sklearn.model_selection import *
+from sklearn.linear_model import *
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import csv
@@ -36,8 +38,8 @@ tr_target_names = np.array(['ham', 'spam'])
 tr_labels = tr_target_names[tr_target]
 
 # Train the Model
-clf = OneVsRestClassifier(SVC(kernel='linear', probability=True))
-vec = TfidfVectorizer()
+clf = SGDClassifier(loss='log', learning_rate='optimal', shuffle=True)
+vec = CountVectorizer()
 vector = vec.fit_transform(train_data['message'])
 clf.fit(vector, tr_labels)
 

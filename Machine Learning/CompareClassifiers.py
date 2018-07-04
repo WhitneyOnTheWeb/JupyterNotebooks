@@ -18,17 +18,17 @@ from sklearn.svm import *
 import pandas as pd
 
 # Performance comparison between available classifiers~~~~~~~~~~~~~~~~~~~~~~~~~
-def performance(classifiers, vectorizers, train_data, test_data):
+def performance(classifiers, vectorizers, train_data, test_data, train_label, test_label):
     scores = pd.DataFrame(columns=['classifier', 'vectorizer', 'score'])
     for clf in classifiers:
         for vec in vectorizers:
             # Train Models
             vectorize = vec.fit_transform(train_data)
-            clf.fit(vectorize, train_data)
+            clf.fit(vectorize, train_label)
             
             # Score Models
             vectorize = vec.transform(test_data)
-            score = clf.score(vectorize, test_data)
+            score = clf.score(vectorize, test_label)
             scores.loc[len(scores)] = \
                 ([clf.__class__.__name__, vec.__class__.__name__, score])
             print(scores.loc[len(scores)-1])
@@ -41,7 +41,7 @@ print('Data Loaded...')
 print('Preprocessing data...')
 
 data.drop(['Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4'], axis = 1, inplace = True)
-data.rename(columns={'v1': 'label', 'v2': 'message'}, inplace = True)
+data.rename(columns={'v1': 'label', 'v2': 'message'}, inplace = True) 
 data['label'] = data['label'].map({'spam': 1, 'ham': 0})
 print(data.head())
 
@@ -59,8 +59,14 @@ n_classes = target_names.shape[0]
 
 X_train, X_test, y_train, y_test = \
 train_test_split(X, y, test_size=0.33, random_state=42)
-print('Training Set: ', len(X_train))
-print('Testing Set: ', len(X_test))
+
+tr_target = np.array(X_train['label'])
+tr_target_names = np.array(['ham', 'spam'])
+tr_labels = tr_target_names[tr_target]
+
+te_target = np.array(X_test['label'])
+te_target_names = np.array(['ham', 'spam'])
+te_labels = te_target_names[te_target]
 
 print('Measuring Model Performances...')
 performance(
@@ -89,5 +95,7 @@ performance(
         #HashingVectorizer()
     ],
     X_train['message'],
-    X_test['message']
+    X_test['message'],
+    tr_target,
+    te_target
 )
