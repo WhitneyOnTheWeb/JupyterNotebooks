@@ -1,5 +1,6 @@
 from sklearn.svm import *
 from sklearn.multiclass import *
+from sklearn.calibration import *
 from sklearn.model_selection import *
 from sklearn.linear_model import *
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -38,8 +39,8 @@ tr_target_names = np.array(['ham', 'spam'])
 tr_labels = tr_target_names[tr_target]
 
 # Train the Model
-clf = SGDClassifier(loss='log', learning_rate='optimal', shuffle=True)
-vec = CountVectorizer()
+clf = OneVsRestClassifier(SVC(kernel='linear', probability=True))
+vec = TfidfVectorizer()
 vector = vec.fit_transform(train_data['message'])
 clf.fit(vector, tr_labels)
 
@@ -58,6 +59,7 @@ def index():
             vec_msg = vec.transform([message])
             pred = clf.predict(vec_msg).tolist()
             prob = clf.predict_proba(vec_msg).tolist()
+            prob = ['{0:7f}'.format(float(p)) for col in prob for p in col]
     except BaseException as inst:
         error = str(type(inst).__name__) + ' ' + str(inst)
     return jsonify(message=message
@@ -66,5 +68,5 @@ def index():
                 , error=error)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 666))
+    port = int(os.environ.get('PORT', 600))
     app.run(host='0.0.0.0', port=port, debug=True, use_reloader=True)

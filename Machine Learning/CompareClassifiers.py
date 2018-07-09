@@ -33,7 +33,7 @@ def performance(classifiers, vectorizers, train_data, test_data, train_label, te
                 ([clf.__class__.__name__, vec.__class__.__name__, score])
             print(scores.loc[len(scores)-1])
             print()
-    return scores
+    return scores.sort_values(by=['score'], ascending=False)
 
 
 data = pd.read_csv('data/spam.csv', encoding='latin-1')
